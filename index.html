@@ -1631,8 +1631,8 @@
       const container = document.getElementById('agent-list');
       document.getElementById('sidebar-header').textContent = `Agent Fleet — ${agents.length} agents`;
 
-      container.innerHTML = agents.map((a, i) => `
-        <div class="agent-card${i === 0 ? ' active' : ''}" data-agent-id="${a.id}" onclick="selectAgent(this)">
+      container.innerHTML = agents.map((a) => `
+        <div class="agent-card${activeAgent === a.id ? ' active' : ''}" data-agent-id="${a.id}" onclick="selectAgent(this)">
           <div class="agent-top">
             <div class="agent-name"><span class="agent-emoji">${a.avatar_emoji || '🤖'}</span> ${esc(a.name)}</div>
             <div class="agent-status ${a.status || 'idle'}">${capitalize(a.status || 'idle')}</div>
@@ -1649,21 +1649,19 @@
       // Toggle: click same agent again to clear filter
       if (activeAgent === agentId) {
         activeAgent = null;
-        document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
-        updateFilterIndicator();
-        renderBoard();
-        if (currentTab === 'timeline') renderTimeline();
-        addLog('info', 'Showing all tasks');
-        return;
+      } else {
+        activeAgent = agentId;
       }
-      activeAgent = agentId;
-      document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
+      // Update sidebar highlight
+      document.querySelectorAll('.agent-card').forEach(c => {
+        c.classList.toggle('active', c.dataset.agentId === activeAgent);
+      });
       updateFilterIndicator();
+      // Switch to board tab so the filter is visible
+      if (currentTab !== 'board') switchTab('board');
       renderBoard();
-      if (currentTab === 'timeline') renderTimeline();
-      const agent = agentMap[agentId];
-      addLog('info', `Filtered by: ${agent ? agent.name : 'Unknown'}`);
+      const agent = activeAgent ? agentMap[activeAgent] : null;
+      addLog('info', agent ? `Filtered by: ${agent.name}` : 'Showing all tasks');
     }
 
     function updateFilterIndicator() {
