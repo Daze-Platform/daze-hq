@@ -1409,6 +1409,7 @@
     let systemLogs = [];
     let currentTask = null; // For editing
     let activeChannel = 'all'; // Channel filter state
+    let activeAgent = null; // Agent filter state (null = show all)
 
     // Channel metadata
     const CHANNELS = {
@@ -1433,8 +1434,14 @@
     }
 
     function getFilteredTasks() {
-      if (activeChannel === 'all') return tasks;
-      return tasks.filter(t => (t.channel || 'engineering') === activeChannel);
+      let filtered = tasks;
+      if (activeChannel !== 'all') {
+        filtered = filtered.filter(t => (t.channel || 'engineering') === activeChannel);
+      }
+      if (activeAgent) {
+        filtered = filtered.filter(t => t.assigned_agent === activeAgent);
+      }
+      return filtered;
     }
 
     // --- Clock ---
@@ -1605,29 +1612,16 @@
     }
 
     function filterTasksByAgent(agentId) {
-      // Switch to board tab and highlight agent's tasks
+      // Switch to board tab and filter by agent
       switchTab('board');
+      activeAgent = agentId;
       
-      // Visual highlight for agent's tasks
-      document.querySelectorAll('.task-card').forEach(card => {
-        card.style.opacity = '0.3';
+      // Update sidebar active state
+      document.querySelectorAll('.agent-card').forEach(c => {
+        c.classList.toggle('active', c.dataset.agentId === agentId);
       });
-      
-      tasks.filter(t => t.assigned_agent === agentId).forEach(task => {
-        const card = document.querySelector(`[data-task-id="${task.id}"]`);
-        if (card) {
-          card.style.opacity = '1';
-          card.style.boxShadow = '0 0 0 2px var(--accent-blue)';
-        }
-      });
-      
-      // Reset after 3 seconds
-      setTimeout(() => {
-        document.querySelectorAll('.task-card').forEach(card => {
-          card.style.opacity = '1';
-          card.style.boxShadow = '';
-        });
-      }, 3000);
+      updateFilterIndicator();
+      renderBoard();
       
       addLog('info', `Filtered tasks for agent ${agentId}`);
     }
@@ -1651,8 +1645,44 @@
     }
 
     function selectAgent(el) {
+      const agentId = el.dataset.agentId;
+      // Toggle: click same agent again to clear filter
+      if (activeAgent === agentId) {
+        activeAgent = null;
+        document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
+        updateFilterIndicator();
+        renderBoard();
+        if (currentTab === 'timeline') renderTimeline();
+        addLog('info', 'Showing all tasks');
+        return;
+      }
+      activeAgent = agentId;
       document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
+      updateFilterIndicator();
+      renderBoard();
+      if (currentTab === 'timeline') renderTimeline();
+      const agent = agentMap[agentId];
+      addLog('info', `Filtered by: ${agent ? agent.name : 'Unknown'}`);
+    }
+
+    function updateFilterIndicator() {
+      let indicator = document.getElementById('agent-filter-indicator');
+      if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'agent-filter-indicator';
+        indicator.style.cssText = 'padding: 6px 12px; margin: 0 12px 8px; border-radius: 8px; background: rgba(74,158,255,0.12); border: 1px solid rgba(74,158,255,0.25); color: var(--accent-blue); font-size: 12px; display: none; align-items: center; justify-content: space-between; cursor: pointer;';
+        indicator.onclick = () => { activeAgent = null; document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active')); updateFilterIndicator(); renderBoard(); if (currentTab === 'timeline') renderTimeline(); };
+        const header = document.getElementById('sidebar-header');
+        header.parentNode.insertBefore(indicator, header.nextSibling);
+      }
+      if (activeAgent && agentMap[activeAgent]) {
+        const a = agentMap[activeAgent];
+        indicator.innerHTML = `${a.avatar_emoji || '🤖'} ${a.name}'s tasks <span style="opacity:0.6; margin-left: 6px;">✕ clear</span>`;
+        indicator.style.display = 'flex';
+      } else {
+        indicator.style.display = 'none';
+      }
     }
 
     // --- Render agents page ---
@@ -2058,7 +2088,7 @@
       const filtered = getFilteredTasks();
       document.getElementById('stat-agents').textContent = agents.length;
       document.getElementById('stat-active').textContent = agents.filter(a => a.status === 'active').length;
-      document.getElementById('stat-tasks').textContent = filtered.length + (activeChannel !== 'all' ? '/' + tasks.length : '');
+      document.getElementById('stat-tasks').textContent = filtered.length + ((activeChannel !== 'all' || activeAgent) ? '/' + tasks.length : '');
       document.getElementById('stat-review').textContent = filtered.filter(t => t.status === 'review').length;
 
       // Done today
