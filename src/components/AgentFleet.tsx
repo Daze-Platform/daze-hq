@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { AgentFleet as AgentFleetType } from '../types'
+import type { AgentFleet as AgentFleetType } from '../types'
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime()
