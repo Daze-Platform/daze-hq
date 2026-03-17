@@ -20,6 +20,9 @@ export interface MissionAgent {
   status: string
   sort_order: number
   current_task: string | null
+  last_action: string | null
+  last_action_at: string | null
+  last_seen_at: string | null
   created_at: string
   updated_at: string
 }
