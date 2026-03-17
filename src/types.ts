@@ -40,6 +40,19 @@ export const PRIORITY_COLORS: Record<string, string> = {
   low: 'bg-green-500/20 text-green-400 border-green-500/30',
 }
 
+export interface AgentFleet {
+  id: string
+  name: string
+  role: string
+  emoji: string
+  status: 'active' | 'idle' | 'blocked' | 'coming_soon'
+  current_task: string | null
+  last_action: string | null
+  last_updated: string
+  is_coming_soon: boolean
+  color: string | null
+}
+
 export const CHANNEL_LABELS: Record<string, string> = {
   engineering: 'Engineering',
   gtm: 'Go-to-Market',
