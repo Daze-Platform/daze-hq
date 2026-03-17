@@ -52,7 +52,7 @@ export function KanbanBoard() {
     <div className="hq-container">
       <header className="hq-header">
         <div className="header-left">
-          <img src="/daze-logo.png" alt="Daze" className="header-logo" />
+          <img src="/daze-logo.png?v=2" alt="Daze" className="header-logo" />
           <h1>Daze HQ</h1>
           <span className="header-badge">Mission Control</span>
         </div>
