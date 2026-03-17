@@ -273,6 +273,73 @@ body {
   letter-spacing: 0.5px;
 }
 
+.password-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.forgot-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font);
+  transition: opacity 0.2s;
+}
+
+.forgot-link:hover {
+  opacity: 0.75;
+}
+
+.back-to-login {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 0;
+  font-family: var(--font);
+  text-align: center;
+  transition: color 0.2s;
+}
+
+.back-to-login:hover {
+  color: var(--text-primary);
+}
+
+.login-success {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #86efac;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.reset-sent-title {
+  font-weight: 600;
+  color: #bbf7d0;
+  margin: 0 0 4px 0;
+}
+
+.reset-sent-sub {
+  margin: 0;
+  color: #86efac;
+  font-size: 13px;
+}
+
+.reset-sent-sub strong {
+  color: #bbf7d0;
+}
+
 /* Header */
 .hq-container {
   display: flex;
