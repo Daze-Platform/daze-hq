@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { TaskCard } from './TaskCard'
 import { CreateTaskModal } from './CreateTaskModal'
 import { AgentFleet } from './AgentFleet'
+import { AgentFleetV2 } from './AgentFleetV2'
 import { CHANNELS, CHANNEL_LABELS, CHANNEL_ICONS } from '../types'
 import type { MissionTask, MissionAgent } from '../types'
 
@@ -129,7 +130,7 @@ export function KanbanBoard() {
           )}
         </>
       ) : (
-        <AgentFleet />
+        <AgentFleetV2 />
       )}
     </div>
   )
